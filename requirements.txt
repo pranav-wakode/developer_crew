@@ -1,0 +1,23 @@
+# CrewAI Framework - Main dependency for creating AI agents and crews
+crewai==1.3.0
+
+# CrewAI Tools - Additional tool support and utilities
+crewai-tools==1.3.0
+
+# LangChain Community - Required for DuckDuckGoSearchRun tool
+langchain-community==0.4.1
+
+# LangChain Core - Required dependency for langchain-community
+langchain-core==1.0.2
+
+# LangChain Classic - Required dependency for langchain-community
+langchain-classic==1.0.0
+
+# LangChain Text Splitters - Required dependency for langchain-community
+langchain-text-splitters==1.0.0
+
+# DuckDuckGo Search - Required for DuckDuckGoSearchRun from langchain-community
+ddgs==9.6.1
+
+# LiteLLM - Required by CrewAI for LLM connections (supports Ollama and other providers)
+litellm==1.79.0
