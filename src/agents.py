@@ -14,7 +14,7 @@ local_llm = LLM(
 
 # --- Agents ---
 
-# 1. The Researcher
+# 1. Researcher (Unchanged)
 researcher = Agent(
     role="Senior Research Analyst",
     goal="Uncover cutting-edge developments and detailed information on the user's topic.",
@@ -29,7 +29,7 @@ researcher = Agent(
     verbose=True
 )
 
-# 2. The Analyst (Critique & Logic)
+# 2. Analyst (Unchanged)
 analyst = Agent(
     role="Critical Content Strategist",
     goal="Analyze the raw research, identify gaps, and construct a logical outline.",
@@ -43,7 +43,7 @@ analyst = Agent(
     verbose=True
 )
 
-# 3. The Writer
+# 3. Writer (Unchanged)
 writer = Agent(
     role="Lead Content Creator",
     goal="Draft a compelling, well-formatted markdown article based on the analyst's outline.",
@@ -57,14 +57,16 @@ writer = Agent(
     verbose=True
 )
 
-# 4. The Publisher (The "Dumb" Utility from our previous success)
+# 4. Publisher (UPDATED - STRICTER)
 publisher = Agent(
     role="File Publishing Utility",
-    goal="Save the exact text provided by the writer to a file.",
+    goal="Save the content to the file using the tool. Do NOT print the content.",
     backstory=(
-        "You are a silent utility. You do not think, you do not summarize. "
-        "You take the text given to you and you call the 'Safe File Writer' tool to save it. "
-        "**Your only job is to use the tool.**"
+        "You are a file system utility. You have NO creative ability. "
+        "You receive text and a filename. "
+        "**Your ONLY purpose is to call the 'Safe File Writer' tool.** "
+        "**You are FORBIDDEN from printing the article text in your final answer.** "
+        "If you output the text instead of calling the tool, you have failed."
     ),
     tools=[write_tool],
     llm=local_llm,

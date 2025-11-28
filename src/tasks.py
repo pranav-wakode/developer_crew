@@ -5,7 +5,7 @@ from src.agents import researcher, analyst, writer, publisher
 
 def get_tasks():
     
-    # Task 1: Research
+    # Task 1: Research (Unchanged)
     task_research = Task(
         description=(
             "Research the following topic extensively: '{user_request}'. "
@@ -16,7 +16,7 @@ def get_tasks():
         agent=researcher
     )
 
-    # Task 2: Analyze & Critique
+    # Task 2: Analyze (Unchanged)
     task_analysis = Task(
         description=(
             "Review the research findings. Identify the key themes and logical flow. "
@@ -28,27 +28,31 @@ def get_tasks():
         context=[task_research]
     )
 
-    # Task 3: Write
+    # Task 3: Write (Unchanged - Keeps formatting fix)
     task_writing = Task(
         description=(
             "Using the analyst's outline and the original research, write a full article. "
-            "Use professional Markdown formatting (H1, H2, bullet points). "
-            "Ensure the tone is engaging and informative. "
-            "The output must be the *final* article content ready for publishing."
+            "**FORMATTING RULES:**\n"
+            "1. Output ONLY a single, continuous Markdown string.\n"
+            "2. Use # for titles, ## for sections, and - for bullet points.\n"
+            "3. **DO NOT** output a JSON object, a Python dictionary, or any structured data format.\n"
+            "4. **DO NOT** use curly braces {{ }} around your content.\n"
+            "5. Just write the text directly, starting with the Title."
         ),
-        expected_output="The complete, formatted text of the article in Markdown.",
+        expected_output="A single string of Markdown text representing the article.",
         agent=writer,
         context=[task_analysis, task_research]
     )
 
-    # Task 4: Publish (Save File)
+    # Task 4: Publish (UPDATED - STRICTER)
     task_publish = Task(
         description=(
-            "Take the final article text from the writer. "
-            "Save it to a file named 'report.md' using the 'Safe File Writer' tool. "
-            "**You MUST call the tool with the filename 'report.md'.**"
+            "You have one simple task:\n"
+            "1. Take the text from the writer.\n"
+            "2. Call the 'Safe File Writer' tool with filename='{filename}' and content=[the text].\n"
+            "**DO NOT output the text yourself. JUST call the tool.**"
         ),
-        expected_output="Confirmation that the file was saved.",
+        expected_output="A confirmation message saying 'File saved successfully'.",
         agent=publisher,
         context=[task_writing]
     )
