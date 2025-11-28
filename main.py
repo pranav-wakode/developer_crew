@@ -1,26 +1,25 @@
 # main.py
 
 from crewai import Crew, Process
-from src.agents import planner, researcher, developer # <-- Import 'developer', not 'writer'
+from src.agents import researcher, analyst, writer, publisher
 from src.tasks import get_tasks
 
-# --- 6. Create the Crew ---
+# --- Create the Crew ---
 project_crew = Crew(
-    agents=[planner, researcher, developer], # <-- Add 'developer' to the list
+    agents=[researcher, analyst, writer, publisher],
     tasks=get_tasks(),
     process=Process.sequential,
     verbose=True
 )
 
-# --- 7. Run the Crew in a Loop ---
+# --- Run the Crew in a Loop ---
 if __name__ == "__main__":
-    print("🚀 Starting the Developer Crew...")
+    print("🚀 Starting the Deep Research Crew...")
     print("---------------------------------")
-    print("Enter your request, or type 'exit' to quit.")
+    print("Enter your research topic (or 'exit' to quit).")
 
     while True:
-        # Get input from the user
-        user_request = input("\n> ")
+        user_request = input("\nTopic > ")
 
         if user_request.lower() == 'exit':
             print("👋 Goodbye!")
@@ -29,14 +28,11 @@ if __name__ == "__main__":
         if not user_request:
             continue
 
-        # Create the inputs dictionary for this run
         inputs = {'user_request': user_request}
-
-        # Kick off the crew with the dynamic inputs
+        
+        # Kick off!
         result = project_crew.kickoff(inputs=inputs)
 
-        print("\n✅ Crew run completed!")
-        print("Final Result:")
-        print(result)
+        print("\n✅ Research completed!")
+        print("Check the 'output/report.md' file.")
         print("---------------------------------")
-        print("Enter your next request...")

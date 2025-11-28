@@ -1,37 +1,56 @@
 # src/tasks.py
 
 from crewai import Task
-from src.agents import planner, researcher, developer  # <-- Import 'developer', not 'writer'
+from src.agents import researcher, analyst, writer, publisher
 
 def get_tasks():
-    # --- 5. Define Tasks (3 Tasks) ---
     
-    # task_plan (unchanged)
-    task_plan = Task(
-        description="Create a plan to fulfill this request: '{user_request}'. "
-                    "Your final output must be a simple plan detailing the search query and the filename.",
-        expected_output="A plan including the string for the search query and the string for the filename.",
-        agent=planner,
-        human_input=True
-    )
-
-    # task_research (unchanged)
+    # Task 1: Research
     task_research = Task(
-        description="Execute the web search using the query from the planner's report.",
-        expected_output="A detailed summary of the research findings.",
-        agent=researcher,
-        context=[task_plan]
+        description=(
+            "Research the following topic extensively: '{user_request}'. "
+            "Focus on recent developments, key facts, pros/cons, and expert opinions. "
+            "Gather as much detailed information as possible."
+        ),
+        expected_output="A detailed document containing all relevant research findings and raw data.",
+        agent=researcher
     )
 
-    # *** THIS IS THE CHANGED TASK ***
-    task_write = Task(
-        description="Take the research findings and the filename from the plan. "
-                    "Write the complete, raw source code for the file. "
-                    "Ensure the code is functional and contains NO markdown formatting or extra text. "
-                    "Save this raw code to the specified filename using the file writing tool.",
-        expected_output="The final file path of the saved code file (e.g., 'output/filename.c').",
-        agent=developer,  # <-- Assign to the new 'developer' agent
-        context=[task_research, task_plan]
+    # Task 2: Analyze & Critique
+    task_analysis = Task(
+        description=(
+            "Review the research findings. Identify the key themes and logical flow. "
+            "Critique the content: remove irrelevant info and highlight the most important points. "
+            "Create a structured outline for an article."
+        ),
+        expected_output="A comprehensive outline and logical structure for the final article.",
+        agent=analyst,
+        context=[task_research]
+    )
+
+    # Task 3: Write
+    task_writing = Task(
+        description=(
+            "Using the analyst's outline and the original research, write a full article. "
+            "Use professional Markdown formatting (H1, H2, bullet points). "
+            "Ensure the tone is engaging and informative. "
+            "The output must be the *final* article content ready for publishing."
+        ),
+        expected_output="The complete, formatted text of the article in Markdown.",
+        agent=writer,
+        context=[task_analysis, task_research]
+    )
+
+    # Task 4: Publish (Save File)
+    task_publish = Task(
+        description=(
+            "Take the final article text from the writer. "
+            "Save it to a file named 'report.md' using the 'Safe File Writer' tool. "
+            "**You MUST call the tool with the filename 'report.md'.**"
+        ),
+        expected_output="Confirmation that the file was saved.",
+        agent=publisher,
+        context=[task_writing]
     )
     
-    return [task_plan, task_research, task_write]
+    return [task_research, task_analysis, task_writing, task_publish]

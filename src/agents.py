@@ -3,7 +3,7 @@
 from crewai import Agent, LLM
 from src.custom_tools import DuckDuckGoSearchTool, SafeFileWriteTool
 
-# --- 3. Setup Tools & LLM ---
+# --- Setup ---
 search_tool = DuckDuckGoSearchTool()
 write_tool = SafeFileWriteTool()
 
@@ -12,41 +12,62 @@ local_llm = LLM(
     base_url="http://localhost:11434"
 )
 
-# --- 4. Create Agents (3 Agents) ---
+# --- Agents ---
 
-# Planner (unchanged)
-planner = Agent(
-    role="Project Planner",
-    goal="Analyze a user's request and create a clear, step-by-step plan. "
-         "The plan must include the exact search query to use and the exact filename for the final output.",
-    backstory="You are a meticulous planner. You break down complex goals into simple, actionable steps. "
-              "You are precise and your output is always clear.",
-    llm=local_llm,
-    verbose=True
-)
-
-# Researcher (unchanged)
+# 1. The Researcher
 researcher = Agent(
-    role="Web Research Specialist",
-    goal="Use the provided search query to find the most relevant and up-to-date information from the web.",
-    backstory="You are an expert web researcher, skilled at sifting through noise to find high-quality, "
-              "factual information. You use the DuckDuckGo search tool effectively.",
+    role="Senior Research Analyst",
+    goal="Uncover cutting-edge developments and detailed information on the user's topic.",
+    backstory=(
+        "You are a veteran analyst with a keen eye for detail. "
+        "You do not just find facts; you find the *truth* and the *context*. "
+        "You ignore surface-level fluff and dig for data, dates, and specific details. "
+        "Use the search tool to gather as much relevant info as possible."
+    ),
     tools=[search_tool],
     llm=local_llm,
     verbose=True
 )
 
-# *** THIS IS THE CHANGED AGENT ***
-# Agent 3: The Developer (replaces Writer)
-developer = Agent(
-    role="Software Developer",
-    goal="Take the research findings and the target filename. Write clean, functional, and correct "
-         "source code to fulfill the request. You must output *only* the raw source code, with no "
-         "markdown formatting (like ```) or explanatory text.",
-    backstory="You are an expert developer. You write code, not documentation. "
-              "You follow the plan and use the research to write perfect, raw source code. "
-              "You only use the tools you are given to write the file.",
-    tools=[write_tool],
+# 2. The Analyst (Critique & Logic)
+analyst = Agent(
+    role="Critical Content Strategist",
+    goal="Analyze the raw research, identify gaps, and construct a logical outline.",
+    backstory=(
+        "You are the brain of the operation. You look at raw data and see the story. "
+        "You critique the research: is it enough? Is it relevant? "
+        "You organize the chaotic notes from the researcher into a clean, logical structure "
+        "that the writer can easily follow."
+    ),
     llm=local_llm,
     verbose=True
+)
+
+# 3. The Writer
+writer = Agent(
+    role="Lead Content Creator",
+    goal="Draft a compelling, well-formatted markdown article based on the analyst's outline.",
+    backstory=(
+        "You are a skilled storyteller and technical writer. "
+        "You take structured outlines and turn them into engaging prose. "
+        "You use Markdown formatting (headers, lists, bold text) effectively to make the content readable. "
+        "You do NOT invent facts; you stick to the provided research."
+    ),
+    llm=local_llm,
+    verbose=True
+)
+
+# 4. The Publisher (The "Dumb" Utility from our previous success)
+publisher = Agent(
+    role="File Publishing Utility",
+    goal="Save the exact text provided by the writer to a file.",
+    backstory=(
+        "You are a silent utility. You do not think, you do not summarize. "
+        "You take the text given to you and you call the 'Safe File Writer' tool to save it. "
+        "**Your only job is to use the tool.**"
+    ),
+    tools=[write_tool],
+    llm=local_llm,
+    verbose=True,
+    allow_delegation=False
 )

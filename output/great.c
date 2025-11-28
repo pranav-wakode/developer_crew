@@ -1,0 +1,2 @@
+def find_greatest(a, b, c):\na = a if a > b else b\nc = c if c > a else a\nreturn c
+if __name__ == '__main__':\n    number1 = int(input('Enter first number: '))\n    number2 = int(input('Enter second number: '))\n    number3 = int(input('Enter third number: '))\n    print(find_greatest(number1, number2, number3))

@@ -1,0 +1,2 @@
+\
+".join(["# How to Create a README\.md File in [language] for Cloning a Typical GitHub Repo\n\n1. Fork the Repository\n   - Click on the 'Fork' button at the top right of the repository page on GitHub. This creates a copy of the repository under your own GitHub account." +
